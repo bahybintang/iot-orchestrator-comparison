@@ -20,7 +20,7 @@ spec:
                   - key: node-role.kubernetes.io/master
                     operator: NotIn
                     values:
-                      - true
+                      - "true"
               - matchExpressions:
                   - key: beta.kubernetes.io/arch
                     operator: In
@@ -32,8 +32,6 @@ spec:
           ports:
             - containerPort: 1883
           volumeMounts:
-            - name: config
-              mountPath: /mosquitto/config
             - name: data
               mountPath: /mosquitto/data
             - name: log
