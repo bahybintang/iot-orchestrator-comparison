@@ -4,21 +4,20 @@
 # Worker x64
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         232        2904           3         283        2960
+Mem:            3421         250        2785           3         385        2956
 Swap:              0           0           0
 k3s@worker:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1543932  28737860   6% /
-Swap:              0           0           0
+/dev/root       30298176 1543996  28737796   6% /
 
 # Master
 k3s@master:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         232        2900           3         288        2962
+Mem:            3421         247        2790           3         383        2957
 Swap:              0           0           0
 k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1553340  28728452   6% /
+/dev/root       30298176 1543988  28737804   6% /
 ```
 
 ## Fresh
@@ -26,20 +25,20 @@ Filesystem     1K-blocks    Used Available Use% Mounted on
 # Master
 k3s@master:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         895        1157           4        1368        2276
+Mem:            3421         706        1705           4        1009        2483
 Swap:              0           0           0
 k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 2597872  27683920   9% /
+/dev/root       30298176 2082776  28199016   7% /
 
 # Worker x64
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         278        2547           4         596        2910
+Mem:            3421         290        2196           3         934        2903
 Swap:              0           0           0
 k3s@worker:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1838912  28442880   7% /
+/dev/root       30298176 2005676  28276116   7% /
 ```
 
 ## With Deployment
