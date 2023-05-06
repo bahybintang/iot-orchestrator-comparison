@@ -10,6 +10,7 @@ resource "azurerm_bastion_host" "bastion" {
   name                = "bastion"
   location            = azurerm_resource_group.cloud.location
   resource_group_name = azurerm_resource_group.cloud.name
+  sku                 = "Basic"
 
   ip_configuration {
     name                 = "configuration"

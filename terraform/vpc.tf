@@ -32,13 +32,36 @@ resource "azurerm_subnet" "bastion" {
 }
 
 resource "azurerm_network_interface" "internal" {
-  name                = "dev-nic"
+  name                = "dev-int-nic"
   location            = azurerm_resource_group.cloud.location
   resource_group_name = azurerm_resource_group.cloud.name
+  dns_servers         = ["8.8.8.8", "1.1.1.1"]
 
   ip_configuration {
-    name                          = "dev-nic-config"
+    name                          = "dev-int-nic-config"
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_public_ip" "k3s_master" {
+  name                = "k3s-master"
+  location            = azurerm_resource_group.cloud.location
+  resource_group_name = azurerm_resource_group.cloud.name
+  allocation_method   = "Static"
+  sku                 = "Basic"
+}
+
+resource "azurerm_network_interface" "external" {
+  name                = "dev-ext-nic"
+  location            = azurerm_resource_group.cloud.location
+  resource_group_name = azurerm_resource_group.cloud.name
+  dns_servers         = ["8.8.8.8", "1.1.1.1"]
+
+  ip_configuration {
+    name                          = "dev-ext-nic-config"
+    subnet_id                     = azurerm_subnet.external.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.k3s_master.id
   }
 }
