@@ -1,8 +1,9 @@
 # Infra Setup
-We initialize the infra using terraform. Before creating the resource, do the following: 
+We initialize the infra using Terraform. Before creating the resource, do the following: 
 1. Create resource-group, storage-account, and storage-account container via your Azure dashboard
 2. Update to `$PWD/terraform/<orchestrator>/provider.tf` accordingly
 3. Apply!
+4. Take a note of the master node IP from Terraform output
 
 
 ```bash
