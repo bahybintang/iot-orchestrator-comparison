@@ -22,6 +22,8 @@ wg genkey | tee client.privatekey | wg pubkey > client.publickey
 # server.publickey sJsaywr1e4lup7+WLA0ZK5NJmYzzqSnCtrQqSvv0QHM=
 # client.privatekey mIEQJ/8oSoxtt0uaJYsdr+g7XlIw5xIF/cFL3qtlxns=
 # client.publickey zrtvEkLj/cxhKZ32Yg2YqCg2IYdsukIu7c5/P71X01I=
+# client1.privatekey oBABPseRkCIN3lGAW+xq/qnHmp9cEfx+Th1Y7SMmU14=
+# client1.publickey Z2uGbn1AaprbyUa1SjbPw9GYEuWDZifQmtk13AF60XI=
 ```
 
 ## Server
@@ -50,8 +52,13 @@ MTU = 1420
 
 [Peer]
 # Client's public key and IP
+PublicKey = Z2uGbn1AaprbyUa1SjbPw9GYEuWDZifQmtk13AF60XI=
+AllowedIPs = 10.112.0.51/32
+
+[Peer]
+# Client's public key and IP
 PublicKey = zrtvEkLj/cxhKZ32Yg2YqCg2IYdsukIu7c5/P71X01I=
-AllowedIPs = 10.112.0.48/29
+AllowedIPs = 10.112.0.50/32
 EOF
 cat  << 'EOF' | sudo tee /etc/wireguard/add-nat.sh
 #!/bin/bash
@@ -92,12 +99,11 @@ sudo systemctl start wg-quick@wg0.service
 sudo ip route add 10.112.0.0/24 dev wg0 scope link
 ```
 
-## Client
+## Client x64
 ```bash
 sudo apt-get update && sudo apt install wireguard
 MASTER_VM_IP=20.89.91.210
 CLIENT_WG_IP=10.112.0.50 # Worker x64
-CLIENT_WG_IP=10.112.0.51 # Worker ARM
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
 [Interface]
@@ -106,6 +112,37 @@ Address = $CLIENT_WG_IP/32
 
 # Private key of the client
 PrivateKey = mIEQJ/8oSoxtt0uaJYsdr+g7XlIw5xIF/cFL3qtlxns=
+
+[Peer]
+# Public Key of the cloud VM
+PublicKey = sJsaywr1e4lup7+WLA0ZK5NJmYzzqSnCtrQqSvv0QHM=
+
+# Public IP of the cloud VM
+Endpoint = $MASTER_VM_IP:51871
+
+# All traffic for the wireguard network should be routed to our cloud VM
+AllowedIPs = 10.112.0.0/24
+
+# Since our clients are located behind NAT devices, send keep alives to our cloud VM to keep the connection in the NAT tables.
+PersistentKeepalive = 20
+EOF
+sudo systemctl enable wg-quick@wg0.service
+sudo systemctl start wg-quick@wg0.service
+```
+
+## Client ARM
+```bash
+sudo apt-get update && sudo apt install wireguard
+MASTER_VM_IP=20.89.91.210
+CLIENT_WG_IP=10.112.0.51 # Worker ARM
+cat << EOF | sudo tee /etc/wireguard/wg0.conf
+# /etc/wireguard/wg0.conf
+[Interface]
+# The IP address of the client in the wireguard network
+Address = $CLIENT_WG_IP/32
+
+# Private key of the client
+PrivateKey = oBABPseRkCIN3lGAW+xq/qnHmp9cEfx+Th1Y7SMmU14=
 
 [Peer]
 # Public Key of the cloud VM
