@@ -11,7 +11,7 @@ resource "azurerm_network_security_group" "k3s" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_ranges    = ["2379", "2380", "6443", "8472", "10250", "51820", "51821"]
-    source_address_prefixes    = ["10.0"]
+    source_address_prefixes    = ["10.0", "103.82.14.237"]
     destination_address_prefix = "*"
   }
 }
