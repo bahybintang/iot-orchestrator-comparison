@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "cloud-computing"
-    storage_account_name = "cloudtf"
+    resource_group_name  = "cloud-computing-kubeedge"
+    storage_account_name = "cloudtfkubeedge"
     container_name       = "tfstate"
     key                  = "dev.terraform.tfstate"
   }
@@ -12,10 +12,10 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "cloud" {
-  name     = "cloud-computing"
+  name     = "cloud-computing-kubeedge"
   location = "Japan East"
 
   tags = {
-    course = "cloud-computing"
+    orchestrator = "kubeedge"
   }
 }
