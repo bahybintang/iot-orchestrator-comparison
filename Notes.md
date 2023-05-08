@@ -1,23 +1,32 @@
 # K3s
 ## Empty
 ```bash
-# Worker x64
-k3s@worker:~$ free -m
-               total        used        free      shared  buff/cache   available
-Mem:            3421         250        2785           3         385        2956
-Swap:              0           0           0
-k3s@worker:~$ df /
-Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1543996  28737796   6% /
-
 # Master
 k3s@master:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         247        2790           3         383        2957
+Mem:            3421         231        2803           3         386        2962
 Swap:              0           0           0
 k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1543988  28737804   6% /
+/dev/root       30298176 1540956  28740836   6% /
+
+# Worker x64
+k3s@worker:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         237        2803           3         379        2956
+Swap:              0           0           0
+k3s@worker:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 1540928  28740864   6% /
+
+# Worker ARM
+edge@orangepione:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:             999          67         818           3         112         904
+Swap:            499           0         499
+edge@orangepione:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/mmcblk0p1  14899752 1680076  13043452  12% /
 ```
 
 ## Fresh
@@ -25,39 +34,57 @@ Filesystem     1K-blocks    Used Available Use% Mounted on
 # Master
 k3s@master:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         706        1705           4        1009        2483
+Mem:            3421         720        1812           4         888        2463
 Swap:              0           0           0
 k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 2082776  28199016   7% /
+/dev/root       30298176 1988432  28293360   7% /
 
 # Worker x64
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         290        2196           3         934        2903
+Mem:            3421         297        2323           3         800        2887
 Swap:              0           0           0
 k3s@worker:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 2005676  28276116   7% /
+/dev/root       30298176 1912212  28369580   7% /
+
+# Worker ARM
+edge@edge:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:             999         106         107           4         785         864
+Swap:            499           0         499
+edge@edge:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/mmcblk0p1  14899752 2180552  12542976  15% /
 ```
 
 ## With Deployment
 ```bash
 # Master
-root@master:/home/k3s# free -m
+k3s@master:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421        1001        1030           4        1389        2169
+Mem:            3421         772        1728           4         920        2409
 Swap:              0           0           0
-root@master:/home/k3s# df /
+k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 2602256  27679536   9% /
+/dev/root       30298176 2009800  28271992   7% /
 
 # Worker x64
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         428        1562           4        1430        2742
+Mem:            3421         422        1363           4        1634        2745
 Swap:              0           0           0
 k3s@worker:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 2599932  27681860   9% /
+/dev/root       30298176 2674148  27607644   9% /
+
+# Worker ARM
+edge@edge:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:             999         132          25           3         840         838
+Swap:            499          12         486
+edge@edge:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/mmcblk0p1  14899752 4160208  10563320  29% /
 ```

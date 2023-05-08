@@ -29,7 +29,7 @@ wg genkey | tee client.privatekey | wg pubkey > client.publickey
 
 ## Server
 ```bash
-sudo apt-get update && sudo apt install wireguard
+sudo apt-get update && sudo apt install wireguard -y
 sudo sysctl -w net.ipv4.ip_forward=1
 cat << 'EOF' | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
@@ -98,12 +98,13 @@ sudo chmod +x /etc/wireguard/del-nat.sh
 sudo systemctl enable wg-quick@wg0.service
 sudo systemctl start wg-quick@wg0.service
 sudo ip route add 10.112.0.0/24 dev wg0 scope link
+sudo apt clean
 ```
 
 ## Client x64
 ```bash
-sudo apt-get update && sudo apt install wireguard
-MASTER_VM_IP=20.89.91.210
+sudo apt-get update && sudo apt install wireguard -y
+MASTER_VM_IP=20.89.20.50
 CLIENT_WG_IP=10.112.0.50 # Worker x64
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
@@ -129,12 +130,13 @@ PersistentKeepalive = 20
 EOF
 sudo systemctl enable wg-quick@wg0.service
 sudo systemctl start wg-quick@wg0.service
+sudo apt clean
 ```
 
 ## Client ARM
 ```bash
-sudo apt-get update && sudo apt install wireguard
-MASTER_VM_IP=20.89.91.210
+sudo apt-get update && sudo apt install wireguard -y
+MASTER_VM_IP=20.89.20.50
 CLIENT_WG_IP=10.112.0.51 # Worker ARM
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
@@ -160,9 +162,11 @@ PersistentKeepalive = 20
 EOF
 sudo systemctl enable wg-quick@wg0.service
 sudo systemctl start wg-quick@wg0.service
+sudo apt clean
 ```
 
 # K3s Install
+K3s version as of install: v1.26.4+k3s1
 ```bash
 # Master
 curl -sfL https://get.k3s.io | sh -s - \
@@ -171,14 +175,15 @@ curl -sfL https://get.k3s.io | sh -s - \
     --disable traefik \
     --disable metrics-server \
     --disable local-storage \
-    --node-external-ip 20.89.91.210 \
+    --node-external-ip 20.89.20.50 \
     --advertise-address 10.112.0.1 \
+    --token "K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
     --flannel-iface wg0
 sudo cat /var/lib/rancher/k3s/server/node-token
 
 # Worker
 curl -sfL https://get.k3s.io | \
     K3S_URL=https://10.112.0.1:6443 \
-    K3S_TOKEN="K1063827ba8fa58b8c99bb8252adab8919fe358c5c9e1791664228949f26d197941::server:a5ba68d46acc0cba3538cd4310ff2e65" \
+    K3S_TOKEN="K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
     sh -s - --flannel-iface wg0
 ```

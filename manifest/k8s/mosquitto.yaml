@@ -12,20 +12,13 @@ spec:
       labels:
         app: mosquitto
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: node-role.kubernetes.io/master
-                    operator: NotIn
-                    values:
-                      - "true"
-              - matchExpressions:
-                  - key: beta.kubernetes.io/arch
-                    operator: In
-                    values:
-                      - amd64
+      nodeSelector:
+        kubernetes.io/hostname: master
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
       containers:
         - name: mosquitto
           image: eclipse-mosquitto:2.0.12

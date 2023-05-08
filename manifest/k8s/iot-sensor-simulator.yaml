@@ -13,13 +13,13 @@ spec:
         app: iot-sensor-simulator
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
+        kubernetes.io/arch: arm
       containers:
         - name: iot-sensor-simulator
-          image: mgarciap/iot-sensor-simulator:latest
-      env:
-        - name: MOSCA_BROKER
-          value: mosquitto
+          image: bintangbahy/iot-sensor-simulator:latest
+          env:
+            - name: MOSCA_BROKER
+              value: mosquitto
 
 ---
 apiVersion: v1
@@ -31,5 +31,5 @@ spec:
     app: iot-sensor-simulator
   ports:
     - name: http
-      port: 8080
-      targetPort: 8080
+      port: 9393
+      targetPort: 9393

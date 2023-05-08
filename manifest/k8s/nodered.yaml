@@ -12,20 +12,8 @@ spec:
       labels:
         app: nodered
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: node-role.kubernetes.io/master
-                    operator: NotIn
-                    values:
-                      - "true"
-              - matchExpressions:
-                  - key: beta.kubernetes.io/arch
-                    operator: In
-                    values:
-                      - amd64
+      nodeSelector:
+        kubernetes.io/hostname: worker
       containers:
         - name: nodered
           image: nodered/node-red:2.1.3
