@@ -150,9 +150,40 @@ Filesystem     1K-blocks    Used Available Use% Mounted on
 # Client ARM
 edge@edge:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:             999         101         395          10         502         855
+Mem:             999         108         355          10         534         848
 Swap:            499           5         494
 edge@edge:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/mmcblk0p1  14899752 2352292  12371236  16% /
+/dev/mmcblk0p1  14899752 2383348  12340180  17% /
+```
+
+## With Deployment
+
+```bash
+# Server
+nomad@nomad-master:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         413        1967           3        1041        2768
+Swap:              0           0           0
+nomad@nomad-master:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 2115228  28166564   7% /
+
+# Client x64
+nomad@nomad-worker:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         451        1166           3        1802        2715
+Swap:              0           0           0
+nomad@nomad-worker:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 2827724  27454068  10% /
+
+# Client ARM
+edge@edge:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:             999         148         100           7         750         811
+Swap:            499           8         490
+edge@edge:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/mmcblk0p1  14899752 3271728  11451800  23% /
 ```

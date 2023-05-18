@@ -278,7 +278,7 @@ sudo systemctl start nomad
 
 ```bash
 sudo mkdir /opt/nomad/data/plugins
-sudo wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0.9.3/containerd-driver-arm64 -O /opt/nomad/data/plugins/containerd-driver
+sudo wget https://cloudcomputingfiles.blob.core.windows.net/containerd-driver/containerd-driver -O /opt/nomad/data/plugins/containerd-driver
 sudo chmod +x /opt/nomad/data/plugins/containerd-driver
 cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
 data_dir  = "/opt/nomad/data"
