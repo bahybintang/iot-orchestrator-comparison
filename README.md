@@ -199,7 +199,7 @@ curl -sfL https://get.k3s.io | \
 Run these script first in all nodes to install Nomad.
 
 ```bash
-sudo apt-get update && sudo apt-get install wget gpg coreutils
+sudo apt-get update && sudo apt-get install wget gpg coreutils containerd
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 sudo apt-get update && sudo apt-get install nomad
@@ -218,9 +218,20 @@ echo 1 | sudo tee /proc/sys/net/bridge/bridge-nf-call-arptables && \
 ## Server
 
 ```bash
+sudo mkdir /opt/nomad/data/plugins
+sudo wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0.9.3/containerd-driver -O /opt/nomad/data/plugins/containerd-driver
+sudo chmod +x /opt/nomad/data/plugins/containerd-driver
 cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
 data_dir  = "/opt/nomad/data"
 bind_addr = "0.0.0.0"
+
+plugin "containerd-driver" {
+  config {
+    enabled = true
+    containerd_runtime = "io.containerd.runc.v2"
+    stats_interval = "5s"
+  }
+}
 
 server {
   enabled          = true
@@ -239,9 +250,20 @@ sudo systemctl start nomad
 ## Client
 
 ```bash
+sudo mkdir /opt/nomad/data/plugins
+sudo wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0.9.3/containerd-driver -O /opt/nomad/data/plugins/containerd-driver
+sudo chmod +x /opt/nomad/data/plugins/containerd-driver
 cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
 data_dir  = "/opt/nomad/data"
 bind_addr = "0.0.0.0"
+
+plugin "containerd-driver" {
+  config {
+    enabled = true
+    containerd_runtime = "io.containerd.runc.v2"
+    stats_interval = "5s"
+  }
+}
 
 client {
   enabled = true

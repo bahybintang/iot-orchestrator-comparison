@@ -132,18 +132,18 @@ Filesystem     1K-blocks    Used Available Use% Mounted on
 # Server
 nomad@nomad-master:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         303        2311           3         807        2883
+Mem:            3421         315        2109           3         996        2868
 Swap:              0           0           0
 nomad@nomad-master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1911564  28370228   7% /
+/dev/root       30298176 2086616  28195176   7% /
 
 # Client x64
 nomad@nomad-worker:~$ free -m
                total        used        free      shared  buff/cache   available
-Mem:            3421         270        2349           3         800        2915
+Mem:            3421         307        2130           3         984        2875
 Swap:              0           0           0
 nomad@nomad-worker:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
-/dev/root       30298176 1911408  28370384   7% /
+/dev/root       30298176 2085660  28196132   7% /
 ```
