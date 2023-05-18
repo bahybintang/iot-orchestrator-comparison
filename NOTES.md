@@ -146,4 +146,13 @@ Swap:              0           0           0
 nomad@nomad-worker:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 2085660  28196132   7% /
+
+# Client ARM
+edge@edge:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:             999         101         395          10         502         855
+Swap:            499           5         494
+edge@edge:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/mmcblk0p1  14899752 2352292  12371236  16% /
 ```

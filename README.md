@@ -223,7 +223,7 @@ sudo wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0
 sudo chmod +x /opt/nomad/data/plugins/containerd-driver
 cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
 data_dir  = "/opt/nomad/data"
-bind_addr = "0.0.0.0"
+bind_addr = "10.112.0.1"
 
 plugin "containerd-driver" {
   config {
@@ -247,7 +247,7 @@ sudo systemctl enable nomad
 sudo systemctl start nomad
 ```
 
-## Client
+## Client x64
 
 ```bash
 sudo mkdir /opt/nomad/data/plugins
@@ -255,7 +255,34 @@ sudo wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0
 sudo chmod +x /opt/nomad/data/plugins/containerd-driver
 cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
 data_dir  = "/opt/nomad/data"
-bind_addr = "0.0.0.0"
+bind_addr = "10.112.0.50"
+
+plugin "containerd-driver" {
+  config {
+    enabled = true
+    containerd_runtime = "io.containerd.runc.v2"
+    stats_interval = "5s"
+  }
+}
+
+client {
+  enabled = true
+  servers = ["10.112.0.1"]
+}
+EOF
+sudo systemctl enable nomad
+sudo systemctl start nomad
+```
+
+## Client ARM
+
+```bash
+sudo mkdir /opt/nomad/data/plugins
+sudo wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0.9.3/containerd-driver-arm64 -O /opt/nomad/data/plugins/containerd-driver
+sudo chmod +x /opt/nomad/data/plugins/containerd-driver
+cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
+data_dir  = "/opt/nomad/data"
+bind_addr = "10.112.0.51"
 
 plugin "containerd-driver" {
   config {
