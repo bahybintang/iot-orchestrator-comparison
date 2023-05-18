@@ -1,5 +1,7 @@
 # K3s
+
 ## Empty
+
 ```bash
 # Master
 k3s@master:~$ free -m
@@ -30,6 +32,7 @@ Filesystem     1K-blocks    Used Available Use% Mounted on
 ```
 
 ## Fresh
+
 ```bash
 # Master
 k3s@master:~$ free -m
@@ -60,6 +63,7 @@ Filesystem     1K-blocks    Used Available Use% Mounted on
 ```
 
 ## With Deployment
+
 ```bash
 # Master
 k3s@master:~$ free -m
@@ -87,4 +91,59 @@ Swap:            499          12         486
 edge@edge:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/mmcblk0p1  14899752 4160208  10563320  29% /
+```
+
+# Nomad
+
+## Empty
+
+```bash
+# Server
+nomad@nomad-master:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         223        2834           3         362        2971
+Swap:              0           0           0
+nomad@nomad-master:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 1515292  28766500   6% /
+
+# Client x64
+nomad@nomad-worker:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         226        2840           3         354        2968
+Swap:              0           0           0
+nomad@nomad-worker:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 1515292  28766500   6% /
+
+# Client ARM
+edge@orangepione:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:             999          67         818           3         112         904
+Swap:            499           0         499
+edge@orangepione:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/mmcblk0p1  14899752 1680076  13043452  12% /
+```
+
+## Fresh
+
+```bash
+# Server
+nomad@nomad-master:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         303        2311           3         807        2883
+Swap:              0           0           0
+nomad@nomad-master:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 1911564  28370228   7% /
+
+# Client x64
+nomad@nomad-worker:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         270        2349           3         800        2915
+Swap:              0           0           0
+nomad@nomad-worker:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 1911408  28370384   7% /
 ```

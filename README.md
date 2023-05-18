@@ -1,20 +1,21 @@
 # Infra Setup
-We initialize the infra using Terraform. Before creating the resource, do the following: 
+
+We initialize the infra using Terraform. Before creating the resource, do the following:
+
 1. Create resource-group, storage-account, and storage-account container via your Azure dashboard
 2. Update to `$PWD/terraform/<orchestrator>/provider.tf` accordingly
 3. Apply!
 4. Take a note of the master node IP from Terraform output
 
-
 ```bash
-$ORCHESTRATOR=k3s # Possible value k3s, nomad, kubeedge
-cd terraform/$ORCHESTRATOR
+cd terraform
 terraform apply
 ```
 
 # Prerequisites: Wireguard Install
 
 Generate keypair for server and client.
+
 ```bash
 wg genkey | tee server.privatekey | wg pubkey > server.publickey
 wg genkey | tee client.privatekey | wg pubkey > client.publickey
@@ -28,6 +29,7 @@ wg genkey | tee client.privatekey | wg pubkey > client.publickey
 ```
 
 ## Server
+
 ```bash
 sudo apt-get update && sudo apt install wireguard -y
 sudo sysctl -w net.ipv4.ip_forward=1
@@ -102,9 +104,10 @@ sudo apt clean
 ```
 
 ## Client x64
+
 ```bash
 sudo apt-get update && sudo apt install wireguard -y
-MASTER_VM_IP=20.89.20.50
+MASTER_VM_IP=20.222.87.252
 CLIENT_WG_IP=10.112.0.50 # Worker x64
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
@@ -134,6 +137,7 @@ sudo apt clean
 ```
 
 ## Client ARM
+
 ```bash
 sudo apt-get update && sudo apt install wireguard -y
 MASTER_VM_IP=20.89.20.50
@@ -166,7 +170,9 @@ sudo apt clean
 ```
 
 # K3s Install
+
 K3s version as of install: v1.26.4+k3s1
+
 ```bash
 # Master
 curl -sfL https://get.k3s.io | sh -s - \
@@ -186,4 +192,62 @@ curl -sfL https://get.k3s.io | \
     K3S_URL=https://10.112.0.1:6443 \
     K3S_TOKEN="K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
     sh -s - --flannel-iface wg0
+```
+
+# Nomad Install
+
+Run these script first in all nodes to install Nomad.
+
+```bash
+sudo apt-get update && sudo apt-get install wget gpg coreutils
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt-get update && sudo apt-get install nomad
+
+curl -L -o cni-plugins.tgz "https://github.com/containernetworking/plugins/releases/download/v1.0.0/cni-plugins-linux-$( [ $(uname -m) = aarch64 ] && echo arm64 || echo amd64)"-v1.0.0.tgz && \
+  sudo mkdir -p /opt/cni/bin && \
+  sudo tar -C /opt/cni/bin -xzf cni-plugins.tgz
+
+rm /home/nomad/cni-plugins.tgz
+
+echo 1 | sudo tee /proc/sys/net/bridge/bridge-nf-call-arptables && \
+  echo 1 | sudo tee /proc/sys/net/bridge/bridge-nf-call-ip6tables && \
+  echo 1 | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
+```
+
+## Server
+
+```bash
+cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
+data_dir  = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+server {
+  enabled          = true
+  bootstrap_expect = 1
+}
+
+client {
+  enabled = true
+  servers = ["10.112.0.1"]
+}
+EOF
+sudo systemctl enable nomad
+sudo systemctl start nomad
+```
+
+## Client
+
+```bash
+cat << EOF | sudo tee /etc/nomad.d/nomad.hcl
+data_dir  = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+client {
+  enabled = true
+  servers = ["10.112.0.1"]
+}
+EOF
+sudo systemctl enable nomad
+sudo systemctl start nomad
 ```
