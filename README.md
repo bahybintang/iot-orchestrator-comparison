@@ -300,3 +300,27 @@ EOF
 sudo systemctl enable nomad
 sudo systemctl start nomad
 ```
+
+# KubeEdge Install
+
+```bash
+# Master
+curl -sfL https://get.k3s.io | sh -s - \
+    --write-kubeconfig-mode 644 \
+    --docker \
+    --disable servicelb \
+    --disable traefik \
+    --disable metrics-server \
+    --disable local-storage \
+    --node-external-ip 52.253.116.190 \
+    --advertise-address 10.112.0.1 \
+    --token "K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
+    --flannel-iface wg0
+sudo cat /var/lib/rancher/k3s/server/node-token
+
+# Worker
+curl -sfL https://get.k3s.io | \
+    K3S_URL=https://10.112.0.1:6443 \
+    K3S_TOKEN="K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
+    sh -s - --flannel-iface wg0
+```
