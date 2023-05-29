@@ -107,7 +107,7 @@ sudo apt clean
 
 ```bash
 sudo apt-get update && sudo apt install wireguard -y
-MASTER_VM_IP=20.222.87.252
+MASTER_VM_IP=<MASTER_VM_IP>
 CLIENT_WG_IP=10.112.0.50 # Worker x64
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
@@ -140,7 +140,7 @@ sudo apt clean
 
 ```bash
 sudo apt-get update && sudo apt install wireguard -y
-MASTER_VM_IP=20.89.20.50
+MASTER_VM_IP=<MASTER_VM_IP>
 CLIENT_WG_IP=10.112.0.51 # Worker ARM
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
@@ -181,7 +181,7 @@ curl -sfL https://get.k3s.io | sh -s - \
     --disable traefik \
     --disable metrics-server \
     --disable local-storage \
-    --node-external-ip 20.89.20.50 \
+    --node-external-ip $(curl ifconfig.me) \
     --advertise-address 10.112.0.1 \
     --token "K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
     --flannel-iface wg0
@@ -305,6 +305,7 @@ sudo systemctl start nomad
 
 ```bash
 # Master
+sudo apt install docker.io -y
 curl -sfL https://get.k3s.io | sh -s - \
     --write-kubeconfig-mode 644 \
     --docker \
@@ -312,15 +313,15 @@ curl -sfL https://get.k3s.io | sh -s - \
     --disable traefik \
     --disable metrics-server \
     --disable local-storage \
-    --node-external-ip 52.253.116.190 \
+    --node-external-ip $(curl ifconfig.me) \
     --advertise-address 10.112.0.1 \
     --token "K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
     --flannel-iface wg0
 sudo cat /var/lib/rancher/k3s/server/node-token
 
-# Worker
-curl -sfL https://get.k3s.io | \
-    K3S_URL=https://10.112.0.1:6443 \
-    K3S_TOKEN="K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
-    sh -s - --flannel-iface wg0
+# Worker x64
+sudo apt install docker.io -y
+
+# Worker ARM
+sudo apt install docker.io -y
 ```
