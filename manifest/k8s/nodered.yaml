@@ -13,7 +13,7 @@ spec:
         app: nodered
     spec:
       nodeSelector:
-        kubernetes.io/hostname: worker
+        node-role.kubernetes.io/worker: "true"
       containers:
         - name: nodered
           image: nodered/node-red:2.1.3

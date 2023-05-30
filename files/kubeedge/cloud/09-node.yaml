@@ -4,7 +4,7 @@ metadata:
   name: kubeedge-worker
   labels:
     name: kubeedge-worker
-    node-role.kubernetes.io/edge: ""
+    node-role.kubernetes.io/worker: "true"
 ---
 apiVersion: v1
 kind: Node
@@ -12,4 +12,4 @@ metadata:
   name: kubeedge-edge
   labels:
     name: kubeedge-edge
-    node-role.kubernetes.io/edge: ""
+    node-role.kubernetes.io/edge: "true"

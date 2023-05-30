@@ -13,12 +13,7 @@ spec:
         app: mosquitto
     spec:
       nodeSelector:
-        kubernetes.io/hostname: master
-      tolerations:
-      - key: "node-role.kubernetes.io/master"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+        node-role.kubernetes.io/master: "true"
       containers:
         - name: mosquitto
           image: eclipse-mosquitto:2.0.12

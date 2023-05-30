@@ -13,7 +13,7 @@ spec:
         app: iot-sensor-simulator
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm
+        node-role.kubernetes.io/edge: "true"
       containers:
         - name: iot-sensor-simulator
           image: bintangbahy/iot-sensor-simulator:latest
