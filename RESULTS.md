@@ -8,15 +8,15 @@
 | --------------------------- | ------ | ------------- | --------------- |
 | K3s                         | 242 MB | 754 MB        | 809 MB          |
 | Nomad                       | 234 MB | 331 MB        | 434 MB          |
-| KubeEdge                    |        |               |                 |
+| KubeEdge                    |        | 908 MB        |                 |
 
-### Worker Node x64
+### Worker Node x86
 
 | Orchestrator/Testing Schema | Empty  | Fresh Install | With Deployment |
 | --------------------------- | ------ | ------------- | --------------- |
 | K3s                         | 248 MB | 311 MB        | 442 MB          |
 | Nomad                       | 237 MB | 322 MB        | 473 MB          |
-| KubeEdge                    |        |               |                 |
+| KubeEdge                    |        | 412 MB        |                 |
 
 ### Worker Node ARM
 
@@ -34,15 +34,15 @@
 | --------------------------- | ------- | ------------- | --------------- |
 | K3s                         | 1541 MB | 1989 MB       | 2010 MB         |
 | Nomad                       | 1516 MB | 2087 MB       | 2116 MB         |
-| KubeEdge                    |         |               |                 |
+| KubeEdge                    |         | 2280 MB       |                 |
 
-### Worker Node x64
+### Worker Node x86
 
 | Orchestrator/Testing Schema | Empty   | Fresh Install | With Deployment |
 | --------------------------- | ------- | ------------- | --------------- |
 | K3s                         | 1541 MB | 1913 MB       | 2675 MB         |
 | Nomad                       | 1516 MB | 2086 MB       | 2828 MB         |
-| KubeEdge                    |         |               |                 |
+| KubeEdge                    |         | 2271 MB       |                 |
 
 ### Worker Node ARM
 
@@ -66,7 +66,7 @@ k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 1540956  28740836   6% /
 
-# Worker x64
+# Worker x86
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
 Mem:            3421         237        2803           3         379        2956
@@ -97,7 +97,7 @@ k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 1988432  28293360   7% /
 
-# Worker x64
+# Worker x86
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
 Mem:            3421         297        2323           3         800        2887
@@ -128,7 +128,7 @@ k3s@master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 2009800  28271992   7% /
 
-# Worker x64
+# Worker x86
 k3s@worker:~$ free -m
                total        used        free      shared  buff/cache   available
 Mem:            3421         422        1363           4        1634        2745
@@ -161,7 +161,7 @@ nomad@nomad-master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 1515292  28766500   6% /
 
-# Client x64
+# Client x86
 nomad@nomad-worker:~$ free -m
                total        used        free      shared  buff/cache   available
 Mem:            3421         226        2840           3         354        2968
@@ -192,7 +192,7 @@ nomad@nomad-master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 2086616  28195176   7% /
 
-# Client x64
+# Client x86
 nomad@nomad-worker:~$ free -m
                total        used        free      shared  buff/cache   available
 Mem:            3421         307        2130           3         984        2875
@@ -223,7 +223,7 @@ nomad@nomad-master:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/root       30298176 2115228  28166564   7% /
 
-# Client x64
+# Client x86
 nomad@nomad-worker:~$ free -m
                total        used        free      shared  buff/cache   available
 Mem:            3421         451        1166           3        1802        2715
@@ -240,4 +240,27 @@ Swap:            499           8         490
 edge@edge:~$ df /
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/mmcblk0p1  14899752 3271728  11451800  23% /
+```
+
+# KubeEdge
+
+## Fresh
+```bash
+# Master
+kubeedge@kubeedge-master:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         866        1363           4        1191        2311
+Swap:              0           0           0
+kubeedge@kubeedge-master:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 2279812  28001980   8% /
+
+# Worker x86
+kubeedge@kubeedge-worker:~$ free -m
+               total        used        free      shared  buff/cache   available
+Mem:            3421         393        1854           4        1173        2784
+Swap:              0           0           0
+kubeedge@kubeedge-worker:~$ df /
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30298176 2270860  28010932   8% /
 ```

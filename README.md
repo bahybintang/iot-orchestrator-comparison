@@ -103,12 +103,12 @@ sudo ip route add 10.112.0.0/24 dev wg0 scope link
 sudo apt clean
 ```
 
-## Client x64
+## Client x86
 
 ```bash
 sudo apt-get update && sudo apt install wireguard -y
-MASTER_VM_IP=<MASTER_VM_IP>
-CLIENT_WG_IP=10.112.0.50 # Worker x64
+MASTER_VM_IP=20.222.96.219
+CLIENT_WG_IP=10.112.0.50 # Worker x86
 cat << EOF | sudo tee /etc/wireguard/wg0.conf
 # /etc/wireguard/wg0.conf
 [Interface]
@@ -247,7 +247,7 @@ sudo systemctl enable nomad
 sudo systemctl start nomad
 ```
 
-## Client x64
+## Client x86
 
 ```bash
 sudo mkdir /opt/nomad/data/plugins
@@ -303,25 +303,69 @@ sudo systemctl start nomad
 
 # KubeEdge Install
 
+## Master
 ```bash
-# Master
+# Run in your PC
+scp -r files/kubeedge/cloud kubeedge@<MASTER_IP>:~/
+
+# Run in master node
+sudo apt update
 sudo apt install docker.io -y
 curl -sfL https://get.k3s.io | sh -s - \
     --write-kubeconfig-mode 644 \
     --docker \
-    --disable servicelb \
     --disable traefik \
     --disable metrics-server \
     --disable local-storage \
-    --node-external-ip $(curl ifconfig.me) \
+    --node-external-ip 10.112.0.1 \
     --advertise-address 10.112.0.1 \
     --token "K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
     --flannel-iface wg0
 sudo cat /var/lib/rancher/k3s/server/node-token
+cd cloud
+sudo ./certgen.sh buildSecret | tee ./06-secret.yaml
+sudo mkdir -p /etc/kubeedge/cloud
+sudo cp /etc/rancher/k3s/k3s.yaml /etc/kubeedge/cloud/kubeconfig.yaml
+kubectl apply -f .
+tar czvf kubecert.tar /etc/kubeedge/
 
-# Worker x64
-sudo apt install docker.io -y
+# Run in your PC
+scp kubeedge@<MASTER_IP>:~/cloud/kubecert.tar files/kubeedge/kubecert.tar
+```
 
-# Worker ARM
+## Worker x86
+```bash
+# Run in your PC
+scp -o "ProxyCommand ssh kubeedge@<NASTER_IP> -W %h:%p" -r files/kubeedge/edge kubeedge@10.0.1.4:~/
+scp -o "ProxyCommand ssh kubeedge@<NASTER_IP> -W %h:%p" files/kubeedge/kubecert.tar kubeedge@10.0.1.4:~/edge/kubecert.tar
+
+# Run in worker node
+cd /
+sudo cp ~/edge/kubecert.tar /
+sudo tar zxvf kubecert.tar
+sudo rm kubecert.tar
+sudo apt update
 sudo apt install docker.io -y
+cd ~/edge
+sudo ./run_daemon.sh only_run_edge cloudhub=10.112.0.1:31337 edgename=kubeedge-worker image="bintangbahy/edgecore:v1.0.0"
+sudo apt clean
+```
+
+## Worker ARM
+
+```bash
+# Run in your PC
+scp -r files/kubeedge/edge kubeedge@<EDGE_IP>:~/
+scp files/kubeedge/kubecert.tar kubeedge@<EDGE_IP>:~/edge/kubecert.tar
+
+# Run in edge node
+cd /
+sudo cp ~/edge/kubecert.tar /
+sudo tar zxvf kubecert.tar
+sudo rm kubecert.tar
+sudo apt update
+sudo apt install docker.io -y
+cd edge
+sudo ./run_daemon.sh only_run_edge cloudhub=10.112.0.1:31337 edgename=kubeedge-egde image="bintangbahy/edgecore-armv7:v1.0.0"
+sudo apt clean
 ```
