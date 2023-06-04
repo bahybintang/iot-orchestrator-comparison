@@ -122,7 +122,7 @@
   when: "'worker' in group_names"
 
 - name: Run EdgeCore daemon on worker nodes
-  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename=kubeedge-worker image="bintangbahy/edgecore:v1.0.0"
+  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 image="bintangbahy/edgecore:v1.0.0"
   vars:
     master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
   when: "'worker' in group_names"
