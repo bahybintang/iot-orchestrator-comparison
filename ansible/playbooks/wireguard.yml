@@ -1,0 +1,6 @@
+---
+- name: wireguard
+  hosts: all
+  become: true
+  roles:
+    - wireguard

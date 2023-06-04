@@ -1,0 +1,24 @@
+# /etc/wireguard/wg0.conf
+[Interface]
+
+# The IP address of this host in the wireguard tunnels
+Address = {{ hostvars[inventory_hostname].vars['wg_ip'] }}
+PostUp = /etc/wireguard/add-nat.sh
+PostDown = /etc/wireguard/del-nat.sh
+
+# Every client connects via UDP to this port. Your Cloud VM must be reachable on this port via UDP from the internet.
+ListenPort = 51871
+Table = off
+
+# Set the private key to the value of server
+PrivateKey = {{ hostvars[inventory_hostname].vars['wg_private_key'] }}
+
+# Set the MTU according to the internet connections of your clients
+# In our case the autodetection assumed 8920 since the cloud network supported jumbo frames.
+MTU = 1420
+
+{% for work in groups['worker'] %}
+[Peer]
+PublicKey = {{ hostvars[work].vars['wg_public_key'] }}
+AllowedIPs = {{ hostvars[work].vars['wg_ip'] }}/32
+{% endfor %}

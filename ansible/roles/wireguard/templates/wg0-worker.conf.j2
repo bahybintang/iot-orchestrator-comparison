@@ -1,0 +1,20 @@
+# /etc/wireguard/wg0.conf
+[Interface]
+# The IP address of the client in the wireguard network
+Address = {{ hostvars[inventory_hostname].vars['wg_ip'] }}/32
+
+# Private key of the client
+PrivateKey = {{ hostvars[inventory_hostname].vars['wg_private_key'] }}
+
+[Peer]
+# Public Key of the cloud VM
+PublicKey = {{ hostvars[groups['master'][0]].vars['wg_public_key'] }}
+
+# Public IP of the cloud VM
+Endpoint = {{ groups['master'][0] }}:51871
+
+# All traffic for the wireguard network should be routed to our cloud VM
+AllowedIPs = 10.112.0.0/24
+
+# Since our clients are located behind NAT devices, send keep alives to our cloud VM to keep the connection in the NAT tables.
+PersistentKeepalive = 20

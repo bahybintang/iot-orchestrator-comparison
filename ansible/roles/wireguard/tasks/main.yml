@@ -1,0 +1,56 @@
+- name: Update apt
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install WireGuard
+  apt:
+    name: wireguard
+    state: latest
+
+- name: Set sysctl ipv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    state: present
+    reload: yes
+
+- name: Copy add-nat.sh and del-nat.sh
+  copy:
+    src: "{{ item }}"
+    dest: /etc/wireguard/
+    owner: root
+    group: root
+    mode: 0700
+  with_items:
+    - add-nat.sh
+    - del-nat.sh
+
+# - name: Display all variables/facts known for a host
+#   debug:
+#     var: hostvars[inventory_hostname]
+#   tags: debug_info
+
+- name: Copy wg0.conf on master
+  template:
+    src: wg0-master.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    owner: root
+    group: root
+    mode: 0600
+  when: "'master' in group_names"
+  notify: restart-wireguard
+
+- name: Copy wg0.conf on worker
+  template:
+    src: wg0-worker.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    owner: root
+    group: root
+    mode: 0600
+  when: "'worker' in group_names"
+  notify: restart-wireguard
+
+- name: Add IP route for WireGuard
+  shell: ip route add 10.112.0.0/24 dev wg0 scope link
+  when: "'master' in group_names"
