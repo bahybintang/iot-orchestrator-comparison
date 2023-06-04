@@ -1,0 +1,21 @@
+{% for node in groups['cloud'] %}
+apiVersion: v1
+kind: Node
+metadata:
+  name: {{ hostvars[node].vars['k8s_hostname'] }}
+  labels:
+    name: {{ hostvars[node].vars['k8s_hostname'] }}
+    node-role.kubernetes.io/worker: "true"
+---
+{% endfor %}
+
+{% for node in groups['edge'] %}
+apiVersion: v1
+kind: Node
+metadata:
+  name: {{ hostvars[node].vars['k8s_hostname'] }}
+  labels:
+    name: {{ hostvars[node].vars['k8s_hostname'] }}
+    node-role.kubernetes.io/edge: "true"
+---
+{% endfor %}

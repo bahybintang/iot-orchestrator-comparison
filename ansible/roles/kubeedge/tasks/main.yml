@@ -37,6 +37,16 @@
   when: "'master' in group_names"
   register: kubeedge_manifest
 
+- name: Copy KubeEdge node manifest
+  template:
+    src: 09-node.yaml.j2
+    dest: /opt/kubeedge/cloud/02-node.yaml
+    owner: root
+    group: root
+    mode: 0644
+  when: "'master' in group_names"
+  register: kubeedge_node_manifest
+
 - name: Generate KubeEdge certs
   shell: |
     cd /opt/kubeedge/cloud
@@ -65,7 +75,7 @@
   shell: |
     cd /opt/kubeedge/cloud
     kubectl apply -f .
-  when: "'master' in group_names and (k3s_install.changed or kubeedge_manifest.changed)"
+  when: "'master' in group_names and (k3s_install.changed or kubeedge_manifest.changed or kubeedge_node_manifest.changed)"
 
 - name: Copy run script to worker nodes
   copy:
@@ -83,7 +93,7 @@
     dest: /tmp/kubeedge.tar.gz
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
     format: gz
   when: "'master' in group_names"
 
@@ -100,7 +110,7 @@
     dest: /tmp/
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
   when: "'worker' in group_names"
 
 - name: Make KubeEdge directory in worker nodes
@@ -122,7 +132,8 @@
   when: "'worker' in group_names"
 
 - name: Run EdgeCore daemon on worker nodes
-  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 image="bintangbahy/edgecore:v1.0.0"
+  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename={{ k8s_hostname }} image="bintangbahy/edgecore:v1.0.0"
   vars:
     master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
+    k8s_hostname: "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}"
   when: "'worker' in group_names"

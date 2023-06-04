@@ -11,17 +11,22 @@ all:
             wg_private_key: cI51/+JENUzUztNHoDZyYvCiZ833BM2Z3C7WRvAPbFg=
             wg_public_key: sJsaywr1e4lup7+WLA0ZK5NJmYzzqSnCtrQqSvv0QHM=
     worker:
-      hosts:
-        10.0.1.4:
-          ansible_ssh_common_args: '-o ProxyCommand="ssh -p 22 -W %h:%p -q kubeedge@20.222.96.219"'
-          vars:
-            wg_ip: 10.112.0.50
-            wg_private_key: mIEQJ/8oSoxtt0uaJYsdr+g7XlIw5xIF/cFL3qtlxns=
-            wg_public_key: zrtvEkLj/cxhKZ32Yg2YqCg2IYdsukIu7c5/P71X01I=
-        192.168.100.108:
-          ansible_ssh_user: edge
-          vars:
-            wg_ip: 10.112.0.51
-            wg_private_key: oBABPseRkCIN3lGAW+xq/qnHmp9cEfx+Th1Y7SMmU14=
-            wg_public_key: Z2uGbn1AaprbyUa1SjbPw9GYEuWDZifQmtk13AF60XI=
-
+      children:
+        cloud:
+          hosts:
+            10.0.1.4:
+              ansible_ssh_common_args: '-o ProxyCommand="ssh -p 22 -W %h:%p -q kubeedge@20.222.96.219"'
+              vars:
+                wg_ip: 10.112.0.50
+                wg_private_key: mIEQJ/8oSoxtt0uaJYsdr+g7XlIw5xIF/cFL3qtlxns=
+                wg_public_key: zrtvEkLj/cxhKZ32Yg2YqCg2IYdsukIu7c5/P71X01I=
+                k8s_hostname: kubeedge-worker
+        edge:
+          hosts:
+            192.168.100.108:
+              ansible_ssh_user: edge
+              vars:
+                wg_ip: 10.112.0.51
+                wg_private_key: oBABPseRkCIN3lGAW+xq/qnHmp9cEfx+Th1Y7SMmU14=
+                wg_public_key: Z2uGbn1AaprbyUa1SjbPw9GYEuWDZifQmtk13AF60XI=
+                k8s_hostname: kubeedge-edge
