@@ -41,7 +41,7 @@
   shell: |
     cd /opt/kubeedge/cloud
     ./certgen.sh buildSecret | tee ./06-secret.yaml
-  when: "'master' in group_names"
+  when: "'master' in group_names and k3s_install.changed"
 
 - name: Make KubeEdge directory
   file:
