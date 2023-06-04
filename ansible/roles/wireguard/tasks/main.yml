@@ -26,10 +26,11 @@
     - add-nat.sh
     - del-nat.sh
 
-# - name: Display all variables/facts known for a host
-#   debug:
-#     var: hostvars[inventory_hostname]
-#   tags: debug_info
+- name: Enable WireGuard service
+  systemd:
+    name: wg-quick@wg0
+    enabled: yes
+    state: started
 
 - name: Copy wg0.conf on master
   template:

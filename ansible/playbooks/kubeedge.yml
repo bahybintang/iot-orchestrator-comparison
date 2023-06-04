@@ -1,5 +1,5 @@
-- name: wireguard
+- name: kubeedge
   hosts: all
   become: true
   roles:
-    - wireguard
+    - kubeedge

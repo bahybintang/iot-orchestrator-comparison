@@ -1,0 +1,128 @@
+- name: Update apt
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+
+- name: Install k3s as master
+  shell: |
+    curl -sfL https://get.k3s.io | sh -s - \
+      --write-kubeconfig-mode 644 \
+      --docker \
+      --disable traefik \
+      --disable metrics-server \
+      --disable local-storage \
+      --node-external-ip "{{ wg_ip }}" \
+      --advertise-address "{{ wg_ip }}" \
+      --token "{{ k3s_token }}" \
+      --flannel-iface wg0
+  vars:
+    wg_ip: "{{ hostvars[inventory_hostname].vars['wg_ip'] }}"
+  when: "'master' in group_names"
+  register: k3s_install
+  changed_when: "'No change detected' not in k3s_install.stdout"
+
+- name: Copy KubeEdge config manifest
+  copy:
+    src: cloud
+    dest: /opt/kubeedge/
+    owner: root
+    group: root
+    mode: 0600
+    directory_mode: yes
+  when: "'master' in group_names"
+  register: kubeedge_manifest
+
+- name: Generate KubeEdge certs
+  shell: |
+    cd /opt/kubeedge/cloud
+    ./certgen.sh buildSecret | tee ./06-secret.yaml
+  when: "'master' in group_names"
+
+- name: Make KubeEdge directory
+  file:
+    path: /etc/kubeedge/cloud
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: "'master' in group_names and k3s_install.changed"
+
+- name: Copy k3s config to KubeEdge directory
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /etc/kubeedge/cloud/kubeconfig.yaml
+    owner: root
+    group: root
+    remote_src: yes
+  when: "'master' in group_names and k3s_install.changed"
+
+- name: Apply k8s manifest
+  shell: |
+    cd /opt/kubeedge/cloud
+    kubectl apply -f .
+  when: "'master' in group_names and (k3s_install.changed or kubeedge_manifest.changed)"
+
+- name: Copy run script to worker nodes
+  copy:
+    src: edge
+    dest: /opt/kubeedge/
+    owner: root
+    group: root
+    mode: 0755
+    directory_mode: yes
+  when: "'worker' in group_names"
+
+- name: Compress KubeEdge cert in master node
+  archive:
+    path: /etc/kubeedge
+    dest: /tmp/kubeedge.tar.gz
+    owner: root
+    group: root
+    mode: 0755
+    format: gz
+  when: "'master' in group_names"
+
+- name: Fetch KubeEdge cert from master node
+  fetch:
+    src: /tmp/kubeedge.tar.gz
+    dest: /tmp/
+    flat: yes
+  when: "'master' in group_names"
+
+- name: Copy KubeEdge cert to worker nodes
+  copy:
+    src: /tmp/kubeedge.tar.gz
+    dest: /tmp/
+    owner: root
+    group: root
+    mode: 0755
+  when: "'worker' in group_names"
+
+- name: Make KubeEdge directory in worker nodes
+  file:
+    path: /etc/kubeedge
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: "'worker' in group_names"
+
+- name: Extract KubeEdge cert in worker nodes
+  unarchive:
+    src: /tmp/kubeedge.tar.gz
+    dest: /etc/
+    owner: root
+    group: root
+    mode: 0755
+  when: "'worker' in group_names"
+
+- name: Run EdgeCore daemon on worker nodes
+  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename=kubeedge-worker image="bintangbahy/edgecore:v1.0.0"
+  vars:
+    master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
+  when: "'worker' in group_names"

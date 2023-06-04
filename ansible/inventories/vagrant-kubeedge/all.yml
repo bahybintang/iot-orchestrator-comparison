@@ -1,6 +1,7 @@
 all:
   vars:
     ansible_ssh_user: vagrant
+    k3s_token: K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a
   children:
     master:
       hosts:
