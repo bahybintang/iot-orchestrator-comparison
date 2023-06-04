@@ -131,9 +131,16 @@
     mode: 0755
   when: "'worker' in group_names"
 
-- name: Run EdgeCore daemon on worker nodes
+- name: Run EdgeCore daemon on cloud worker nodes
   command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename={{ k8s_hostname }} image="bintangbahy/edgecore:v1.0.0"
   vars:
     master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
     k8s_hostname: "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}"
-  when: "'worker' in group_names"
+  when: "'cloud' in group_names"
+
+- name: Run EdgeCore daemon on edge nodes
+  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename={{ k8s_hostname }} image="bintangbahy/edgecore-armv7:v1.0.0"
+  vars:
+    master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
+    k8s_hostname: "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}"
+  when: "'edge' in group_names"
