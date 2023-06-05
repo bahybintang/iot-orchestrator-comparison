@@ -13,7 +13,7 @@ spec:
         app: nodered
     spec:
       nodeSelector:
-        node-role.kubernetes.io/worker: "true"
+        cloud-computing/worker: "true"
       containers:
         - name: nodered
           image: nodered/node-red:2.1.3

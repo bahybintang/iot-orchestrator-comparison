@@ -21,6 +21,7 @@
       --node-external-ip "{{ wg_ip }}" \
       --advertise-address "{{ wg_ip }}" \
       --token "{{ k3s_token }}" \
+      --node-label "cloud-computing/master=true" \
       --flannel-iface wg0
   vars:
     wg_ip: "{{ hostvars[inventory_hostname].vars['wg_ip'] }}"
@@ -131,6 +132,13 @@
     owner: root
     group: root
     mode: 0755
+  when: "'worker' in group_names"
+
+- name: Stop and remove EdgeCore container
+  shell: |
+    docker stop edgecore
+    docker rm edgecore
+  ignore_errors: true
   when: "'worker' in group_names"
 
 - name: Run EdgeCore daemon on cloud worker nodes

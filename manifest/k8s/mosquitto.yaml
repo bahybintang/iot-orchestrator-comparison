@@ -13,7 +13,7 @@ spec:
         app: mosquitto
     spec:
       nodeSelector:
-        node-role.kubernetes.io/master: "true"
+        cloud-computing/master: "true"
       containers:
         - name: mosquitto
           image: eclipse-mosquitto:2.0.12
