@@ -1,0 +1,50 @@
+- name: Install k3s in master
+  shell: |
+    curl -sfL https://get.k3s.io | 
+      K3S_NODE_NAME="{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" \
+      sh -s - \
+      --write-kubeconfig-mode 644 \
+      --disable servicelb \
+      --disable traefik \
+      --disable metrics-server \
+      --disable local-storage \
+      --node-external-ip {{ wg_ip }} \
+      --advertise-address {{ wg_ip }} \
+      --token "{{ k3s_token }}" \
+      --node-label "cloud-computing/master=true" \
+      --flannel-iface wg0
+  vars:
+    wg_ip: "{{ hostvars[inventory_hostname].vars['wg_ip'] }}"
+  when: "'master' in group_names"
+  register: k3s_install
+  changed_when: "'No change detected' not in k3s_install.stdout"
+
+- name: Install k3s in cloud worker
+  shell: |
+    curl -sfL https://get.k3s.io | 
+      K3S_NODE_NAME="{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" \
+      K3S_URL=https://{{ master_ip }}:6443 \
+      K3S_TOKEN="{{ k3s_token }}" \
+      sh -s - \
+      --flannel-iface wg0 \
+      --node-label "cloud-computing/worker=true"
+  vars:
+    master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
+  when: "'cloud' in group_names"
+  register: k3s_install_cloud
+  changed_when: "'No change detected' not in k3s_install_cloud.stdout"
+
+- name: Install k3s in edge worker
+  shell: |
+    curl -sfL https://get.k3s.io | 
+      K3S_NODE_NAME="{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" \
+      K3S_URL=https://{{ master_ip }}:6443 \
+      K3S_TOKEN="{{ k3s_token }}" \
+      sh -s - \
+      --flannel-iface wg0 \
+      --node-label "cloud-computing/edge=true"
+  vars:
+    master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
+  when: "'edge' in group_names"
+  register: k3s_install_edge
+  changed_when: "'No change detected' not in k3s_install_edge.stdout"

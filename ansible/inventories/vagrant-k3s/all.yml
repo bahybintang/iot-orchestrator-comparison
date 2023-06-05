@@ -2,7 +2,7 @@ all:
   vars:
     ansible_ssh_extra_args: -o StrictHostKeyChecking=no
     ansible_ssh_user: vagrant
-    k3s_token: K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a
+    k3s_token: 1018af34ad6707e53041f8b2ccd3f3dc
   children:
     master:
       hosts:
@@ -12,7 +12,7 @@ all:
             wg_ip: 10.112.0.1
             wg_private_key: cI51/+JENUzUztNHoDZyYvCiZ833BM2Z3C7WRvAPbFg=
             wg_public_key: sJsaywr1e4lup7+WLA0ZK5NJmYzzqSnCtrQqSvv0QHM=
-            k8s_hostname: kubeedge-master
+            k8s_hostname: k3s-master
     worker:
       children:
         cloud:
@@ -23,7 +23,7 @@ all:
                 wg_ip: 10.112.0.50
                 wg_private_key: mIEQJ/8oSoxtt0uaJYsdr+g7XlIw5xIF/cFL3qtlxns=
                 wg_public_key: zrtvEkLj/cxhKZ32Yg2YqCg2IYdsukIu7c5/P71X01I=
-                k8s_hostname: kubeedge-worker
+                k8s_hostname: k3s-worker
         edge:
           hosts:
             192.168.69.4:
@@ -32,4 +32,4 @@ all:
                 wg_ip: 10.112.0.51
                 wg_private_key: oBABPseRkCIN3lGAW+xq/qnHmp9cEfx+Th1Y7SMmU14=
                 wg_public_key: Z2uGbn1AaprbyUa1SjbPw9GYEuWDZifQmtk13AF60XI=
-                k8s_hostname: kubeedge-edge
+                k8s_hostname: k3s-edge

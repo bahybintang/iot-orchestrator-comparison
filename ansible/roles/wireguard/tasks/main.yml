@@ -46,9 +46,11 @@
     group: root
     mode: 0644
   when: "'worker' in group_names"
-  notify: 
+  notify:
     - enable-wireguard
     - restart-wireguard
+
+- meta: flush_handlers
 
 - name: Add IP route for WireGuard
   shell: ip route add 10.112.0.0/24 dev wg0 scope link
