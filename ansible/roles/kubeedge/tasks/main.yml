@@ -1,12 +1,19 @@
-- name: Update apt
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
-
 - name: Install Docker
   apt:
+    update_cache: true
     name: docker.io
     state: present
+
+- name: Set Docker cgroup driver
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart Docker
+
+- meta: flush_handlers
 
 - name: Install k3s as master
   shell: |
@@ -23,136 +30,67 @@
       --advertise-address "{{ wg_ip }}" \
       --token "{{ k3s_token }}" \
       --node-label "cloud-computing/master=true" \
-      --flannel-iface wg0 \
-      --kubelet-arg=cgroup-driver=systemd
+      --flannel-iface wg0
   vars:
     wg_ip: "{{ hostvars[inventory_hostname].vars['wg_ip'] }}"
   when: "'master' in group_names"
-  register: k3s_install
-  changed_when: "'No change detected' not in k3s_install.stdout"
 
-- name: Copy KubeEdge config manifest
-  copy:
-    src: cloud
-    dest: /opt/kubeedge/
-    owner: root
-    group: root
-    mode: 0755
-    directory_mode: yes
+- name: Check k3s up
+  service:
+    name: k3s
+    state: started
+    enabled: yes
+  register: k3s
+  until: k3s.status.ActiveState == "active"
+  retries: 15
+  delay: 20
   when: "'master' in group_names"
-  register: kubeedge_manifest
 
-- name: Copy KubeEdge node manifest
-  template:
-    src: 09-node.yaml.j2
-    dest: /opt/kubeedge/cloud/02-node.yaml
-    owner: root
-    group: root
-    mode: 0644
-  when: "'master' in group_names"
-  register: kubeedge_node_manifest
-
-- name: Generate KubeEdge certs
+- name: Install keadm
   shell: |
-    cd /opt/kubeedge/cloud
-    ./certgen.sh buildSecret | tee ./06-secret.yaml
-  when: "'master' in group_names and k3s_install.changed"
+    wget "https://github.com/kubeedge/kubeedge/releases/download/v1.12.1/keadm-v1.12.1-linux-$( [ $(uname -m) = armv7l ] && echo arm || echo amd64).tar.gz"
+    tar -zxvf "keadm-v1.12.1-linux-$( [ $(uname -m) = armv7l ] && echo arm || echo amd64).tar.gz"
+    cp "keadm-v1.12.1-linux-$( [ $(uname -m) = armv7l ] && echo arm || echo amd64)/keadm/keadm" /usr/local/bin/keadm
+    rm "keadm-v1.12.1-linux-$( [ $(uname -m) = armv7l ] && echo arm || echo amd64).tar.gz"
+    rm -rf "keadm-v1.12.1-linux-$( [ $(uname -m) = armv7l ] && echo arm || echo amd64)"
 
-- name: Make KubeEdge directory
-  file:
-    path: /etc/kubeedge/cloud
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-  when: "'master' in group_names and k3s_install.changed"
-
-- name: Copy k3s config to KubeEdge directory
-  copy:
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: /etc/kubeedge/cloud/kubeconfig.yaml
-    owner: root
-    group: root
-    remote_src: yes
-  when: "'master' in group_names and k3s_install.changed"
-
-- name: Apply k8s manifest
+- name: Init kubeedge cloudcore
   shell: |
-    cd /opt/kubeedge/cloud
-    kubectl apply -f .
-  when: "'master' in group_names and (k3s_install.changed or kubeedge_manifest.changed or kubeedge_node_manifest.changed)"
-
-- name: Copy run script to worker nodes
-  copy:
-    src: edge
-    dest: /opt/kubeedge/
-    owner: root
-    group: root
-    mode: 0755
-    directory_mode: yes
-  when: "'worker' in group_names"
-
-- name: Compress KubeEdge cert in master node
-  archive:
-    path: /etc/kubeedge
-    dest: /tmp/kubeedge.tar.gz
-    owner: root
-    group: root
-    mode: 0644
-    format: gz
+    keadm init --advertise-address="{{ hostvars[inventory_hostname].vars['wg_ip'] }}" --profile version=v1.12.1 --kube-config=/etc/rancher/k3s/k3s.yaml
   when: "'master' in group_names"
 
-- name: Fetch KubeEdge cert from master node
-  fetch:
-    src: /tmp/kubeedge.tar.gz
-    dest: /tmp/
-    flat: yes
+- name: Wait until cloudcore up
+  shell: |
+    kubectl get pods -n kubeedge -o wide | grep cloudcore | grep Running
+  retries: 15
+  delay: 20
+  register: cloudcore
+  until: cloudcore.stdout.find("1/1") != -1
   when: "'master' in group_names"
 
-- name: Copy KubeEdge cert to worker nodes
-  copy:
-    src: /tmp/kubeedge.tar.gz
-    dest: /tmp/
-    owner: root
-    group: root
-    mode: 0644
-  when: "'worker' in group_names"
-
-- name: Make KubeEdge directory in worker nodes
-  file:
-    path: /etc/kubeedge
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-  when: "'worker' in group_names"
-
-- name: Extract KubeEdge cert in worker nodes
-  unarchive:
-    src: /tmp/kubeedge.tar.gz
-    dest: /etc/
-    owner: root
-    group: root
-    mode: 0755
-  when: "'worker' in group_names"
-
-- name: Stop and remove EdgeCore container
+- name: Get token
   shell: |
-    docker stop edgecore
-    docker rm edgecore
-  ignore_errors: true
+    keadm gettoken --kube-config=/etc/rancher/k3s/k3s.yaml
+  register: kubeedge_token
+  when: "'master' in group_names"
+
+- set_fact:
+    kubeedge_token: "{{ kubeedge_token.stdout }}"
+  when: "'master' in group_names"
+
+- name: Init kubeedge edgecore
+  shell: |
+    keadm join --edgenode-name "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" --cloudcore-ipport="{{ hostvars[groups['master'][0]].vars['wg_ip'] }}":10000 --token="{{ hostvars[groups['master'][0]]['kubeedge_token'] }}" --kubeedge-version=v1.12.1
   when: "'worker' in group_names"
 
-- name: Run EdgeCore daemon on cloud worker nodes
-  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename={{ k8s_hostname }} image="bintangbahy/edgecore:v1.0.0"
-  vars:
-    master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
-    k8s_hostname: "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}"
-  when: "'cloud' in group_names"
+- name: Set node label worker
+  shell: |
+    kubectl label node "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" cloud-computing/worker=true
+  delegate_to: "{{ groups['master'][0] }}"
+  when: "'worker' in group_names and not 'edge' in group_names"
 
-- name: Run EdgeCore daemon on edge nodes
-  command: /opt/kubeedge/edge/run_daemon.sh only_run_edge cloudhub="{{ master_ip }}":31337 edgename={{ k8s_hostname }} image="bintangbahy/edgecore-armv7:v1.0.0"
-  vars:
-    master_ip: "{{ hostvars[groups['master'][0]].vars['wg_ip'] }}"
-    k8s_hostname: "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}"
+- name: Set node label edge
+  shell: |
+    kubectl label node "{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" cloud-computing/edge=true
+  delegate_to: "{{ groups['master'][0] }}"
   when: "'edge' in group_names"

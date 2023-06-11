@@ -7,7 +7,7 @@ all:
   children:
     master:
       hosts:
-        20.222.81.186:
+        20.89.144.224:
           vars:
             wg_ip: 10.112.0.1
             wg_private_key: cI51/+JENUzUztNHoDZyYvCiZ833BM2Z3C7WRvAPbFg=
@@ -18,7 +18,7 @@ all:
         cloud:
           hosts:
             10.0.1.4:
-              ansible_ssh_extra_args: '-o ProxyCommand="ssh -p 22 -W %h:%p -q kubeedge@20.222.81.186"'
+              ansible_ssh_extra_args: '-o ProxyCommand="ssh -p 22 -W %h:%p -q kubeedge@20.89.144.224"'
               vars:
                 wg_ip: 10.112.0.50
                 wg_private_key: mIEQJ/8oSoxtt0uaJYsdr+g7XlIw5xIF/cFL3qtlxns=
