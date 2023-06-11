@@ -2,8 +2,8 @@ job "iot-sensor-simulator" {
   datacenters = ["dc1"]
 
   constraint {
-    attribute = "${attr.unique.hostname}"
-    value     = "edge"
+    attribute = "${node.unique.name}"
+    value     = "nomad-edge"
   }
 
   group "iot-sensor-simulator" {

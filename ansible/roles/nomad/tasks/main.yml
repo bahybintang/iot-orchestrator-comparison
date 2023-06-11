@@ -51,7 +51,7 @@
 
 - name: Install Nomad containerd driver for edge
   shell: |
-    wget https://github.com/Roblox/nomad-driver-containerd/releases/download/v0.9.3/containerd-driver -O /opt/nomad/data/plugins/containerd-driver
+    wget https://cloudcomputingfiles.blob.core.windows.net/containerd-driver/containerd-driver -O /opt/nomad/data/plugins/containerd-driver
     chmod +x /opt/nomad/data/plugins/containerd-driver
   when: inventory_hostname in groups['edge']
   notify: Restart Nomad

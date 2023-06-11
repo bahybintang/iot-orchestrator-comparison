@@ -2,7 +2,7 @@ job "mosquitto" {
   datacenters = ["dc1"]
 
   constraint {
-    attribute = "${attr.unique.hostname}"
+    attribute = "${node.unique.name}"
     value     = "nomad-master"
   }
 
