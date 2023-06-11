@@ -1,0 +1,23 @@
+data_dir  = "/opt/nomad/data"
+bind_addr = "{{ hostvars[inventory_hostname].vars['wg_ip'] }}"
+name = "{{ hostvars[inventory_hostname].vars['nomad_hostname'] }}"
+
+plugin "containerd-driver" {
+    config {
+        enabled = true
+        containerd_runtime = "io.containerd.runc.v2"
+        stats_interval = "5s"
+    }
+}
+
+{% if inventory_hostname in groups['master'] %}
+server {
+    enabled          = true
+    bootstrap_expect = 1
+}
+{% endif %}
+
+client {
+    enabled = true
+    servers = ["{{ hostvars[groups['master'][0]].vars['wg_ip']}}"]
+}
