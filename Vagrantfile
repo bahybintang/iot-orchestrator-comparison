@@ -7,6 +7,10 @@ Vagrant.configure(2) do |config|
     config.vm.define "master" do |master|
       master.vm.hostname = "master"
       master.vm.network :private_network, ip: "192.168.69.2"
+
+      master.vm.provider "virtualbox" do |pmv|
+        pmv.memory = 2048
+      end
     end
   
     config.vm.define "worker" do |worker|

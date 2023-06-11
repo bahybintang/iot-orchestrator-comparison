@@ -311,7 +311,9 @@ scp -r files/kubeedge/cloud kubeedge@<MASTER_IP>:~/
 # Run in master node
 sudo apt update
 sudo apt install docker.io -y
-curl -sfL https://get.k3s.io | sh -s - \
+curl -sfL https://get.k3s.io | 
+    INSTALL_K3S_VERSION="v1.22.17+k3s1" \
+    sh -s - \
     --write-kubeconfig-mode 644 \
     --docker \
     --disable traefik \
@@ -320,7 +322,8 @@ curl -sfL https://get.k3s.io | sh -s - \
     --node-external-ip 10.112.0.1 \
     --advertise-address 10.112.0.1 \
     --token "K1088326be4c13d64b9aa9a6439e4f30570432dd61981b533c347a082612a1bc49f::server:4b7e56a711ff12f36e10c0081fa4bf5a" \
-    --flannel-iface wg0
+    --flannel-iface wg0 \
+    --kubelet-arg=cgroup-driver=systemd
 sudo cat /var/lib/rancher/k3s/server/node-token
 cd cloud
 sudo ./certgen.sh buildSecret | tee ./06-secret.yaml

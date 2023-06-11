@@ -12,6 +12,7 @@
   shell: |
     curl -sfL https://get.k3s.io | 
       K3S_NODE_NAME="{{ hostvars[inventory_hostname].vars['k8s_hostname'] }}" \
+      INSTALL_K3S_VERSION="v1.22.17+k3s1" \
       sh -s - \
       --write-kubeconfig-mode 644 \
       --docker \
@@ -22,7 +23,8 @@
       --advertise-address "{{ wg_ip }}" \
       --token "{{ k3s_token }}" \
       --node-label "cloud-computing/master=true" \
-      --flannel-iface wg0
+      --flannel-iface wg0 \
+      --kubelet-arg=cgroup-driver=systemd
   vars:
     wg_ip: "{{ hostvars[inventory_hostname].vars['wg_ip'] }}"
   when: "'master' in group_names"
