@@ -1,7 +1,9 @@
 run:
 	sudo qemu-system-aarch64 \
 		-machine raspi3b \
+		# -enable-kvm \
 		-cpu cortex-a53 \
+		# -cpu host,aarch64=off \
 		-smp 4 \
 		-m 1G \
 		-kernel kernel8.img \

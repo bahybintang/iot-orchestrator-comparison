@@ -17,11 +17,6 @@ Vagrant.configure(2) do |config|
       worker.vm.hostname = "worker"
       worker.vm.network :private_network, ip: "192.168.69.3"
     end
-
-    config.vm.define "edge" do |edge|
-      edge.vm.hostname = "edge"
-      edge.vm.network :private_network, ip: "192.168.69.4"
-    end
   
     # Increase memory for Libvirt
     config.vm.provider "libvirt" do |libvirt|

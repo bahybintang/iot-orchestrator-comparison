@@ -2,4 +2,5 @@
 .DS_Store
 .vagrant
 **/2023-05-03-raspios-bullseye-armhf-lite.img
+**/2023-05-03-raspios-bullseye-armhf-lite-init.img
 test.sh

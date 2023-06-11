@@ -26,8 +26,10 @@ all:
                 k8s_hostname: k3s-worker
         edge:
           hosts:
-            192.168.69.4:
-              ansible_ssh_private_key_file: .vagrant/machines/edge/virtualbox/private_key
+            127.0.0.1:
+              ansible_ssh_user: edge
+              ansible_ssh_pass: edge
+              ansible_ssh_port: 2022
               vars:
                 wg_ip: 10.112.0.51
                 wg_private_key: oBABPseRkCIN3lGAW+xq/qnHmp9cEfx+Th1Y7SMmU14=
