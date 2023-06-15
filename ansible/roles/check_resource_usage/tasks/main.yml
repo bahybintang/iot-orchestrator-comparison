@@ -3,7 +3,7 @@
     rm /tmp/usage.csv
 
     start_time=$(date +%s)
-    duration=60
+    duration=600
 
     echo "time,cpu,mem,storage" >> /tmp/usage.csv
 

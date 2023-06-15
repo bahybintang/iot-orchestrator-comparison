@@ -1,3 +1,7 @@
+- name: Disable swap
+  shell: |
+    swapoff -a
+
 - name: Install needed package
   apt:
     update_cache: yes

@@ -1,20 +1,20 @@
 locals {
   orchestrators = {
-    "kubeedge" : {
-      orchestrator_name        = "kubeedge"
-      allowed_ports            = [22, 2379, 2380, 6443, 8472, 10250, 51820, 51821, 51871]
-      allowed_source_addresses = ["10.0", "10.112", "103.82.14.237", "122.11.166.8", azurerm_public_ip.nat.ip_address]
-    },
+    # "kubeedge" : {
+    #   orchestrator_name        = "kubeedge"
+    #   allowed_ports            = [22, 2379, 2380, 6443, 8472, 10250, 51820, 51821, 51871]
+    #   allowed_source_addresses = ["10.0", "10.112", "103.82.14.237", "122.11.166.8", azurerm_public_ip.nat.ip_address]
+    # },
     # "nomad" : {
     #   orchestrator_name        = "nomad"
     #   allowed_ports            = [22, 4646, 4647, 4648, 51871]
     #   allowed_source_addresses = ["10.0", "10.112", "103.82.14.237", "122.11.166.8", azurerm_public_ip.nat.ip_address]
     # },
-    # "k3s": {
-    #   orchestrator_name        = "k3s"
-    #   allowed_ports            = [22, 2379, 2380, 6443, 8472, 10250, 51820, 51821, 51871]
-    #   allowed_source_addresses = ["10.0", "10.112", "103.82.14.237", azurerm_public_ip.nat.ip_address]
-    # }
+    "k3s": {
+      orchestrator_name        = "k3s"
+      allowed_ports            = [22, 2379, 2380, 6443, 8472, 10250, 51820, 51821, 51871]
+      allowed_source_addresses = ["10.0", "10.112", "103.82.14.237", azurerm_public_ip.nat.ip_address]
+    }
   }
 }
 
