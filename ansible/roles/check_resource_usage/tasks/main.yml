@@ -1,5 +1,24 @@
-- name: Check memory usage
-  shell: free -m | grep Mem | awk '{print $3 * 1.04858}'
+- name: Log CPU, memory, and storage usage to usage.txt
+  shell: |
+    rm /tmp/usage.txt
 
-- name: Check storage usage
-  shell: df / | grep /dev/ | awk '{print $3 / 1000}'
+    start_time=$(date +%s)
+    duration=5
+
+    while true; do
+        top -bn1 | awk 'NR>7 { cpu+=$9 } END { printf("%.2f,", cpu) }' >> /tmp/usage.txt && free --mega | awk 'NR==2 { printf $3"," }' >> /tmp/usage.txt && df -m / | awk 'NR==2 { printf $3"\n" }' >> /tmp/usage.txt
+
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if [ $elapsed_time -ge $duration ]; then
+            break
+        fi
+
+        sleep 1
+    done
+
+- name: Copy usage.txt to local machine
+  fetch:
+    src: /tmp/usage.txt
+    dest: .../../../../usage-{{ inventory_hostname }}.txt
+    flat: yes
