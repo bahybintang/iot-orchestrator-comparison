@@ -1,5 +1,6 @@
 all:
   vars:
+    orchestrator: kubeedge
     ansible_ssh_extra_args: -o StrictHostKeyChecking=no
     ansible_ssh_user: vagrant
     k3s_token: 1018af34ad6707e53041f8b2ccd3f3dc

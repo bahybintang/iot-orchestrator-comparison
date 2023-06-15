@@ -1,5 +1,7 @@
 - name: Check memory usage
   hosts: all
   become: true
+  strategy: free
+  gather_facts: false
   roles:
     - check_resource_usage
