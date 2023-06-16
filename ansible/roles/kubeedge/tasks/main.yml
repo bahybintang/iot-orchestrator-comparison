@@ -62,6 +62,7 @@
   shell: |
     keadm init --advertise-address="{{ hostvars[inventory_hostname].vars['wg_ip'] }}" --profile version=v1.12.1 --kube-config=/etc/rancher/k3s/k3s.yaml
   when: "'master' in group_names"
+  ignore_errors: true
 
 - name: Wait until cloudcore up
   shell: |
